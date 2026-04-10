@@ -498,7 +498,7 @@ p, a, span:not(.collage-item-overlay),
 }
 
 .bio-text p:not([class]) {
-    text-indent: 2em;     /* Estilo de Párrafo Español: justificado y con sangría en primera línea */
+    text-indent: 0;
 }
 
 .bio-lead {
