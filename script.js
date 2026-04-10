@@ -517,6 +517,105 @@
     }
 
     // ============================================
+    // Waitlist Form & Modal System
+    // ============================================
+    function initWaitlist() {
+        const waitlistBtn = document.getElementById('joinWaitlistBtn');
+        const waitlistModal = document.getElementById('waitlistModal');
+        const waitlistClose = document.getElementById('waitlistClose');
+        const waitlistForm = document.getElementById('waitlistForm');
+        const waitlistMessage = document.getElementById('waitlistMessage');
+        const waitlistSubmitBtn = document.getElementById('waitlistSubmitBtn');
+
+        if (!waitlistBtn || !waitlistModal) return;
+
+        // Open Modal
+        waitlistBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            waitlistModal.classList.add('active');
+            document.body.classList.add('lightbox-open');
+        });
+
+        // Close functions
+        const closeWaitlist = () => {
+            waitlistModal.classList.remove('active');
+            document.body.classList.remove('lightbox-open');
+            setTimeout(() => {
+                if(waitlistMessage) waitlistMessage.style.display = 'none';
+                if(waitlistForm) waitlistForm.reset();
+            }, 400);
+        };
+
+        if (waitlistClose) waitlistClose.addEventListener('click', closeWaitlist);
+
+        waitlistModal.addEventListener('click', (e) => {
+            if (e.target === waitlistModal) closeWaitlist();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && waitlistModal.classList.contains('active')) {
+                closeWaitlist();
+            }
+        });
+
+        // Handle Form Submission via Google Apps Script
+        if (waitlistForm) {
+            waitlistForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const emailInput = document.getElementById('waitlistEmail').value;
+                const termsChecked = document.getElementById('waitlistTerms').checked;
+                
+                if (!termsChecked) return; // HTML native usually catches this anyway
+
+                // UI loading state
+                const originalBtnText = waitlistSubmitBtn.innerText;
+                waitlistSubmitBtn.innerText = 'Enviando...';
+                waitlistSubmitBtn.disabled = true;
+
+                // API GOOGLE APPS SCRIPT URL HERE
+                // (The user will replace this string with their generated Web App URL)
+                const GOOGLE_SCRIPT_URL = 'INSERT_GOOGLE_SCRIPT_URL_HERE';
+                
+                // If it's the placeholder, simulate success so the UI works while they configure it
+                if (GOOGLE_SCRIPT_URL === 'INSERT_GOOGLE_SCRIPT_URL_HERE') {
+                    setTimeout(() => {
+                        waitlistSubmitBtn.innerText = originalBtnText;
+                        waitlistSubmitBtn.disabled = false;
+                        waitlistMessage.innerText = "¡Suscripción simulada! Configura el link de Google Sheets en script.js";
+                        waitlistMessage.style.display = 'block';
+                        waitlistForm.reset();
+                    }, 1000);
+                    return;
+                }
+
+                // Production fetch
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // requires no-cors for native Google Apps Script execution
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInput })
+                })
+                .then(() => {
+                    waitlistSubmitBtn.innerText = originalBtnText;
+                    waitlistSubmitBtn.disabled = false;
+                    waitlistMessage.innerText = "¡Gracias por unirte! Te hemos anotado en la lista.";
+                    waitlistMessage.style.display = 'block';
+                    waitlistForm.reset();
+                })
+                .catch(error => {
+                    waitlistSubmitBtn.innerText = originalBtnText;
+                    waitlistSubmitBtn.disabled = false;
+                    waitlistMessage.innerText = "Hubo un error al conectar. Intenta luego.";
+                    waitlistMessage.style.display = 'block';
+                    waitlistMessage.style.color = '#ff4444';
+                });
+            });
+        }
+    }
+
+    // ============================================
     // Initialize All Modules
     // ============================================
     function init() {
@@ -541,6 +640,7 @@
         initHeroSlider(); // Auto slider cada 5s
         initLightbox();
         initDynamicRotation();
+        initWaitlist();
 
         // Log initialization (remove in production)
         console.log('%c LOW KANE | Experience Loaded', 'color: #fff; background: #111; padding: 8px 16px; font-weight: bold;');
