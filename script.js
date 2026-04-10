@@ -465,6 +465,58 @@
     }
 
     // ============================================
+    // Lightbox Modal Interactive System
+    // ============================================
+    function initLightbox() {
+        const lightbox = document.getElementById('imageLightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxClose = document.getElementById('lightboxClose');
+        
+        if (!lightbox || !lightboxImg || !lightboxClose) return;
+
+        // Open Lightbox when a collage item is clicked
+        collageItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const imgEl = item.querySelector('img');
+                if (imgEl && imgEl.src) {
+                    lightboxImg.src = imgEl.src;
+                    lightbox.classList.add('active');
+                    document.body.classList.add('lightbox-open');
+                }
+            });
+        });
+
+        // Close Lightbox functions
+        const closeLightbox = () => {
+            lightbox.classList.remove('active');
+            document.body.classList.remove('lightbox-open');
+            // Give time for fade out before stripping src
+            setTimeout(() => {
+                if (!lightbox.classList.contains('active')) {
+                    lightboxImg.src = '';
+                }
+            }, 400); 
+        };
+
+        // Close on 'X' click
+        lightboxClose.addEventListener('click', closeLightbox);
+
+        // Close on Background dark overlay click
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox || e.target.classList.contains('lightbox-wrapper')) {
+                closeLightbox();
+            }
+        });
+
+        // Close on ESC key press
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                closeLightbox();
+            }
+        });
+    }
+
+    // ============================================
     // Initialize All Modules
     // ============================================
     function init() {
@@ -487,6 +539,7 @@
         initKeyboardNav();
         initCollageHover();
         initHeroSlider(); // Auto slider cada 5s
+        initLightbox();
         initDynamicRotation();
 
         // Log initialization (remove in production)
