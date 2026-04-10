@@ -413,6 +413,58 @@
     }
 
     // ============================================
+    // Collage Dynamic Rotation
+    // ============================================
+    function initDynamicRotation() {
+        if (!collageItems || collageItems.length === 0) return;
+        
+        const allImages = [
+            "DSC08729-BY-BLVCKSUS.jpg", "DSC08820-BY-BLVCKSUS.jpg", "DSC08742-BY-BLVCKSUS.jpg",
+            "DSC08773-BY-BLVCKSUS.jpg", "DSC08775-BY-BLVCKSUS.jpg", "DSC08838-BY-BLVCKSUS.jpg",
+            "DSC08848-BY-BLVCKSUS.jpg", "DSC08867-BY-BLVCKSUS.jpg", "DSC08881-BY-BLVCKSUS.jpg",
+            "DSC08936-BY-BLVCKSUS.jpg", "DSC08944-BY-BLVCKSUS.jpg", "DSC08996-BY-BLVCKSUS.jpg",
+            "DSC09031-BY-BLVCKSUS.jpg", "DSC09134-BY-BLVCKSUS.jpg", "DSC09138-BY-BLVCKSUS.jpg",
+            "DSC09157-BY-BLVCKSUS.jpg", "DSC09169-BY-BLVCKSUS.jpg"
+        ];
+        
+        setInterval(() => {
+            // Check if page is visible (save resources)
+            if (document.hidden) return;
+            
+            // Get currently visible image filenames
+            const currentVisibles = Array.from(collageItems).map(item => {
+                const img = item.querySelector('img');
+                if (!img) return null;
+                const src = img.getAttribute('src');
+                return src ? src.substring(src.lastIndexOf('/') + 1) : null;
+            }).filter(Boolean);
+            
+            // Filter pool for unused images
+            const unusedImages = allImages.filter(img => !currentVisibles.includes(img));
+            if (unusedImages.length === 0) return; // Prevent crash if all used
+            
+            // Pick a random unused image
+            const nextImage = unusedImages[Math.floor(Math.random() * unusedImages.length)];
+            
+            // Pick a random slot from the 6
+            const randomSlotIndex = Math.floor(Math.random() * collageItems.length);
+            const slotToUpdate = collageItems[randomSlotIndex];
+            const imgEl = slotToUpdate.querySelector('img');
+            
+            if (imgEl) {
+                // Crossfade effect
+                imgEl.style.opacity = '0';
+                setTimeout(() => {
+                    imgEl.src = nextImage;
+                    imgEl.onload = () => {
+                        imgEl.style.opacity = '1';
+                    };
+                }, 600); // Wait for fade out (matches CSS transition)
+            }
+        }, 10000); // 10 seconds interval
+    }
+
+    // ============================================
     // Initialize All Modules
     // ============================================
     function init() {
@@ -435,6 +487,7 @@
         initKeyboardNav();
         initCollageHover();
         initHeroSlider(); // Auto slider cada 5s
+        initDynamicRotation();
 
         // Log initialization (remove in production)
         console.log('%c LOW KANE | Experience Loaded', 'color: #fff; background: #111; padding: 8px 16px; font-weight: bold;');
