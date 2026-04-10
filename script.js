@@ -575,8 +575,7 @@
                 waitlistSubmitBtn.disabled = true;
 
                 // API GOOGLE APPS SCRIPT URL HERE
-                // (The user will replace this string with their generated Web App URL)
-                const GOOGLE_SCRIPT_URL = 'INSERT_GOOGLE_SCRIPT_URL_HERE';
+                const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXCRP-t6AoWRZYhdroa8qg7nif7pRT-Bgy3ifa8UFLbCiJ0K6Ovs2O2b3zEE-1Qy1s/exec';
                 
                 // If it's the placeholder, simulate success so the UI works while they configure it
                 if (GOOGLE_SCRIPT_URL === 'INSERT_GOOGLE_SCRIPT_URL_HERE') {
